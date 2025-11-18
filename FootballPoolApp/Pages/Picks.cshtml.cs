@@ -37,7 +37,8 @@ public class PicksModel : PageModel
 
     public async Task OnGetAsync(int? week)
     {
-        MaxWeek = await _context.Games.Select(g => g.Week).DefaultIfEmpty(0).MaxAsync();
+        var weeks = await _context.Games.Select(g => g.Week).ToListAsync();
+        MaxWeek = weeks.Any() ? weeks.Max() : 1;
         CurrentWeek = week ?? MaxWeek;
         
         if (CurrentWeek < 1) CurrentWeek = 1;
