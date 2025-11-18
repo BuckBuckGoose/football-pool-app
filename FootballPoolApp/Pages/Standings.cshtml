@@ -1,0 +1,65 @@
+@page "{week:int?}"
+@model FootballPoolApp.Pages.StandingsModel
+@{
+    ViewData["Title"] = "Standings";
+}
+
+<h1>Standings</h1>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link @(Model.ViewType == "weekly" ? "active" : "")" asp-page="./Standings" asp-route-week="@Model.CurrentWeek">Weekly</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(Model.ViewType == "season" ? "active" : "")" asp-page="./StandingsSeason">Season</a>
+    </li>
+</ul>
+
+@if (Model.ViewType == "weekly")
+{
+    <h2>Week @Model.CurrentWeek Standings</h2>
+    
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="btn-group" role="group">
+                @for (int i = 1; i <= Model.MaxWeek; i++)
+                {
+                    <a asp-page="./Standings" asp-route-week="@i" class="btn btn-@(i == Model.CurrentWeek ? "primary" : "outline-primary")">Week @i</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.WeeklyStandings.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>User</th>
+                    <th>Correct Picks</th>
+                    <th>Total Picks</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int rank = 1;}
+                @foreach (var standing in Model.WeeklyStandings)
+                {
+                    <tr>
+                        <td>@rank</td>
+                        <td>@standing.UserName</td>
+                        <td>@standing.CorrectPicks</td>
+                        <td>@standing.TotalPicks</td>
+                        <td>@standing.Percentage.ToString("P1")</td>
+                    </tr>
+                    rank++;
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No standings available for Week @Model.CurrentWeek yet.</p>
+    }
+}

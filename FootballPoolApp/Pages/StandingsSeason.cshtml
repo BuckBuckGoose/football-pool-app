@@ -1,0 +1,51 @@
+@page
+@model FootballPoolApp.Pages.StandingsSeasonModel
+@{
+    ViewData["Title"] = "Season Standings";
+}
+
+<h1>Standings</h1>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link" asp-page="./Standings">Weekly</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" asp-page="./StandingsSeason">Season</a>
+    </li>
+</ul>
+
+<h2>Season Standings</h2>
+
+@if (Model.SeasonStandings.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Correct Picks</th>
+                <th>Total Picks</th>
+                <th>Percentage</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int rank = 1;}
+            @foreach (var standing in Model.SeasonStandings)
+            {
+                <tr>
+                    <td>@rank</td>
+                    <td>@standing.UserName</td>
+                    <td>@standing.TotalCorrectPicks</td>
+                    <td>@standing.TotalPicks</td>
+                    <td>@standing.Percentage.ToString("P1")</td>
+                </tr>
+                rank++;
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No season standings available yet. Games need to be scored first.</p>
+}

@@ -1,0 +1,65 @@
+@page
+@model FootballPoolApp.Pages.Admin.CreateGameModel
+@{
+    ViewData["Title"] = "Create Game";
+}
+
+<h1>Create Game</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Game.Week" class="control-label"></label>
+                <input asp-for="Game.Week" class="form-control" />
+                <span asp-validation-for="Game.Week" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Game.League" class="control-label"></label>
+                <select asp-for="Game.League" class="form-control">
+                    <option value="">-- Select League --</option>
+                    <option value="NCAAF">NCAAF</option>
+                    <option value="NFL">NFL</option>
+                </select>
+                <span asp-validation-for="Game.League" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Game.Favorite" class="control-label"></label>
+                <input asp-for="Game.Favorite" class="form-control" />
+                <span asp-validation-for="Game.Favorite" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Game.Underdog" class="control-label"></label>
+                <input asp-for="Game.Underdog" class="form-control" />
+                <span asp-validation-for="Game.Underdog" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Game.Spread" class="control-label"></label>
+                <input asp-for="Game.Spread" class="form-control" type="number" step="0.5" />
+                <span asp-validation-for="Game.Spread" class="text-danger"></span>
+                <small class="form-text text-muted">Enter as positive number (e.g., 7.5 for -7.5)</small>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Game.GameTime" class="control-label"></label>
+                <input asp-for="Game.GameTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Game.GameTime" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a asp-page="./Games" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

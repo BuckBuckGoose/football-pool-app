@@ -1,0 +1,102 @@
+@page "{week:int?}"
+@model FootballPoolApp.Pages.PicksModel
+@{
+    ViewData["Title"] = "Make Your Picks";
+}
+
+<h1>Make Your Picks - Week @Model.CurrentWeek</h1>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="btn-group" role="group">
+            @for (int i = 1; i <= Model.MaxWeek; i++)
+            {
+                <a asp-page="./Picks" asp-route-week="@i" class="btn btn-@(i == Model.CurrentWeek ? "primary" : "outline-primary")">Week @i</a>
+            }
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-success">@Model.Message</div>
+}
+
+@if (Model.Games.Any())
+{
+    <form method="post">
+        <input type="hidden" name="week" value="@Model.CurrentWeek" />
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>League</th>
+                    <th>Game Time</th>
+                    <th>Matchup</th>
+                    <th>Spread</th>
+                    <th>Your Pick</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Games.Count; i++)
+                {
+                    var game = Model.Games[i];
+                    var userPick = Model.UserPicks.FirstOrDefault(p => p.GameId == game.Id);
+                    var isLocked = game.GameTime <= DateTime.UtcNow;
+                    
+                    <tr class="@(isLocked ? "table-secondary" : "")">
+                        <td>@game.League</td>
+                        <td>@game.GameTime.ToString("MMM dd h:mm tt")</td>
+                        <td>
+                            <strong>@game.Favorite</strong> vs @game.Underdog
+                            @if (game.IsScored)
+                            {
+                                <br />
+                                <small class="text-muted">Final: @game.FavoriteScore - @game.UnderdogScore</small>
+                            }
+                        </td>
+                        <td>@game.Favorite -@game.Spread</td>
+                        <td>
+                            @if (isLocked)
+                            {
+                                if (userPick != null)
+                                {
+                                    <span class="badge bg-secondary">@userPick.SelectedTeam</span>
+                                    @if (game.IsScored && userPick.IsCorrect.HasValue)
+                                    {
+                                        <span class="badge bg-@(userPick.IsCorrect.Value ? "success" : "danger")">
+                                            @(userPick.IsCorrect.Value ? "✓ Correct" : "✗ Wrong")
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No pick made</span>
+                                }
+                            }
+                            else
+                            {
+                                <input type="hidden" name="Picks[@i].GameId" value="@game.Id" />
+                                <select name="Picks[@i].SelectedTeam" class="form-select">
+                                    <option value="">-- Select Team --</option>
+                                    <option value="@game.Favorite" selected="@(userPick?.SelectedTeam == game.Favorite)">@game.Favorite</option>
+                                    <option value="@game.Underdog" selected="@(userPick?.SelectedTeam == game.Underdog)">@game.Underdog</option>
+                                </select>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+        @if (Model.Games.Any(g => g.GameTime > DateTime.UtcNow))
+        {
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save Picks</button>
+            </div>
+        }
+    </form>
+}
+else
+{
+    <p>No games available for Week @Model.CurrentWeek.</p>
+}
