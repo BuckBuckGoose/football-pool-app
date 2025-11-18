@@ -37,12 +37,16 @@ artifacts/
 *.db-shm
 *.db-wal
 
-# Migrations
-**/Migrations/
+# Migrations - Keep migrations in source control
+# **/Migrations/
 
-# User secrets
-appsettings.*.json
+# User secrets - Keep development settings
+# appsettings.*.json
 
 # Rider
 .idea/
 *.sln.iml
+
+# Node modules and client libraries (these should be restored via package managers)
+node_modules/
+wwwroot/lib/
