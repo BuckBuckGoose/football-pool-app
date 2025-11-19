@@ -1,0 +1,53 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Football Pick'em Pool</h1>
+    <p class="lead">Pick against the spread for Top-25 NCAAF and NFL games each week!</p>
+    
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Make Picks</h5>
+                        <p class="card-text">Select your picks for this week's games</p>
+                        <a asp-page="/Picks" class="btn btn-primary">Go to Picks</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Standings</h5>
+                        <p class="card-text">View weekly and season standings</p>
+                        <a asp-page="/Standings" class="btn btn-primary">View Standings</a>
+                    </div>
+                </div>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Admin</h5>
+                            <p class="card-text">Manage games and scores</p>
+                            <a asp-page="/Admin/Games" class="btn btn-primary">Manage Games</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="mt-5">
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">Register</a>
+            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-lg">Login</a>
+        </div>
+    }
+</div>

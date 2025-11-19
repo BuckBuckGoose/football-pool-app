@@ -1,0 +1,63 @@
+@page
+@model FootballPoolApp.Pages.Admin.GamesModel
+@{
+    ViewData["Title"] = "Manage Games";
+}
+
+<h1>Manage Games</h1>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <a asp-page="./CreateGame" class="btn btn-primary">Add New Game</a>
+    </div>
+</div>
+
+@if (Model.Games.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>League</th>
+                <th>Matchup</th>
+                <th>Spread</th>
+                <th>Game Time</th>
+                <th>Score</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var game in Model.Games)
+            {
+                <tr>
+                    <td>@game.Week</td>
+                    <td>@game.League</td>
+                    <td>@game.Favorite vs @game.Underdog</td>
+                    <td>@game.Favorite -@game.Spread</td>
+                    <td>@game.GameTime.ToString("MMM dd, yyyy h:mm tt")</td>
+                    <td>
+                        @if (game.IsScored)
+                        {
+                            <span>@game.Favorite: @game.FavoriteScore, @game.Underdog: @game.UnderdogScore</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not scored</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-page="./ScoreGame" asp-route-id="@game.Id" class="btn btn-sm btn-success">Score</a>
+                        <a asp-page="./EditGame" asp-route-id="@game.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@game.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No games loaded yet. <a asp-page="./CreateGame">Add a game</a> to get started.</p>
+}
