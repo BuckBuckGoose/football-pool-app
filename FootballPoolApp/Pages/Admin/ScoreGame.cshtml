@@ -14,17 +14,18 @@
         <p><strong>Spread:</strong> @Model.Game.Favorite -@Model.Game.Spread</p>
         
         <form method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Game.Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
             <div class="form-group mb-3">
-                <label asp-for="Game.FavoriteScore" class="control-label">@Model.Game.Favorite Score</label>
+                <label asp-for="Game.FavoriteScore" class="control-label">Favorite Score</label>
                 <input asp-for="Game.FavoriteScore" class="form-control" type="number" />
                 <span asp-validation-for="Game.FavoriteScore" class="text-danger"></span>
             </div>
             
             <div class="form-group mb-3">
-                <label asp-for="Game.UnderdogScore" class="control-label">@Model.Game.Underdog Score</label>
+                <label asp-for="Game.UnderdogScore" class="control-label">Underdog Score</label>
                 <input asp-for="Game.UnderdogScore" class="form-control" type="number" />
                 <span asp-validation-for="Game.UnderdogScore" class="text-danger"></span>
             </div>

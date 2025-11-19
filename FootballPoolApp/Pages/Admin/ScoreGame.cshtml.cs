@@ -11,10 +11,12 @@ namespace FootballPoolApp.Pages.Admin;
 public class ScoreGameModel : PageModel
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<ScoreGameModel> _logger;
 
-    public ScoreGameModel(ApplicationDbContext context)
+    public ScoreGameModel(ApplicationDbContext context, ILogger<ScoreGameModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [BindProperty]
@@ -34,19 +36,48 @@ public class ScoreGameModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
+        _logger.LogInformation("ScoreGame OnPostAsync called. Game.Id={Id}", Game?.Id);
 
-        var game = await _context.Games.Include(g => g.Picks).FirstOrDefaultAsync(g => g.Id == Game.Id);
+        // Load the existing game including picks
+        var id = Game?.Id ?? 0;
+        var game = await _context.Games.Include(g => g.Picks).FirstOrDefaultAsync(g => g.Id == id);
         if (game == null)
         {
             return NotFound();
         }
 
-        game.FavoriteScore = Game.FavoriteScore;
-        game.UnderdogScore = Game.UnderdogScore;
+        // Update only the score fields from the bound Game to avoid ModelState validation
+        // failing due to other [Required] properties on Game that aren't posted here.
+        // Log the posted form values to help diagnose binding issues
+        foreach (var key in Request.Form.Keys)
+        {
+            _logger.LogInformation("Form: {Key} = {Value}", key, Request.Form[key]);
+        }
+
+        // Manually bind the score fields from the form to avoid TryUpdateModelAsync binding problems
+        var favValue = Request.Form["Game.FavoriteScore"].ToString();
+        var undValue = Request.Form["Game.UnderdogScore"].ToString();
+
+        if (int.TryParse(favValue, out var favScore))
+        {
+            game.FavoriteScore = favScore;
+        }
+        else
+        {
+            game.FavoriteScore = null;
+            _logger.LogWarning("Failed to parse FavoriteScore from form value '{Value}'", favValue);
+        }
+
+        if (int.TryParse(undValue, out var undScore))
+        {
+            game.UnderdogScore = undScore;
+        }
+        else
+        {
+            game.UnderdogScore = null;
+            _logger.LogWarning("Failed to parse UnderdogScore from form value '{Value}'", undValue);
+        }
+
         game.IsScored = true;
 
         // Calculate which team won against the spread
@@ -70,6 +101,7 @@ public class ScoreGameModel : PageModel
         }
 
         await _context.SaveChangesAsync();
+        _logger.LogInformation("Saved scores for Game.Id={Id}: FavoriteScore={Fav} UnderdogScore={Und}", game.Id, game.FavoriteScore, game.UnderdogScore);
 
         return RedirectToPage("./Games");
     }
